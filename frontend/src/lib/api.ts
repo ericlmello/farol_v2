@@ -1,27 +1,15 @@
-import axios from 'axios'
+import axios from 'axios';
 
-// Configuração para diferentes ambientes
-const getApiBaseUrl = () => {
-  // Priorizar variável de ambiente se definida
-  if (process.env.NEXT_PUBLIC_BACKEND_URL) {
-    return process.env.NEXT_PUBLIC_BACKEND_URL
-  }
+// =====================================================================
+// CORREÇÃO APLICADA AQUI
+// 1. A baseURL agora lê a variável correta: NEXT_PUBLIC_API_URL.
+// 2. A baseURL NÃO inclui mais o /api/v1. Isso evita URLs duplicadas.
+//    As chamadas agora devem ser feitas como: api.post('/api/v1/auth/register')
+// =====================================================================
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-  // Para evitar problemas de hidratação, usar uma configuração consistente
-  // Em desenvolvimento local, usar localhost com prefixo da API
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:8000/api/v1'
-  }
-  
-  // Em produção ou Docker, usar o nome do serviço com prefixo da API
-  return 'http://backend:8000/api/v1'
-}
-
-const API_BASE_URL = getApiBaseUrl()
-
-// Log para debug (apenas em desenvolvimento e no cliente)
-if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
-  console.log('🔗 API Base URL:', API_BASE_URL)
+if (typeof window !== 'undefined') {
+  console.log('🔗 Usando a URL base da API:', API_BASE_URL);
 }
 
 export const api = axios.create({
@@ -29,40 +17,37 @@ export const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-})
+});
 
-// Interceptor para adicionar token de autenticação
+// Interceptor para adicionar token de autenticação (seu código original mantido)
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+  // Garante que o código só acesse localStorage no navegador
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
-  return config
-})
+  return config;
+});
 
-// Interceptor para tratar erros de resposta
+// Interceptor para tratar erros de resposta (seu código original mantido)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     // Log detalhado para debug
-    if (process.env.NODE_ENV === 'development') {
-      console.error('🚨 API Error:', {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        config: {
-          url: error.config?.url,
-          method: error.config?.method,
-          baseURL: error.config?.baseURL
-        }
-      })
-    }
+    console.error('🚨 Erro na API:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url,
+    });
 
-    if (error.response?.status === 401) {
-      localStorage.removeItem('authToken')
-      window.location.href = '/login'
+    // Redirecionamento em caso de erro 401
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      localStorage.removeItem('authToken');
+      window.location.href = '/login';
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
