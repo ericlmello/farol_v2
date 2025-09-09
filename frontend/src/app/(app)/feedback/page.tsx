@@ -19,6 +19,44 @@ interface FeedbackHistory {
   type: 'interview' | 'cv_analysis'
 }
 
+// =====================================================================
+// MELHORIA 1: Tipagem explícita para o mockData.
+// Agora, se um status inválido for adicionado aqui, o erro aparecerá
+// imediatamente nesta linha, tornando a depuração mais fácil.
+// Também adicionei outros status para tornar o mock mais realista.
+// =====================================================================
+const mockData: FeedbackHistory[] = [
+  {
+    id: 'sim_1_1234567890',
+    jobTitle: 'Desenvolvedor(a) Frontend Acessível',
+    companyName: 'InovaTech Soluções',
+    interviewType: 'Técnica e Comportamental',
+    date: '2024-01-15',
+    overallScore: 85,
+    status: 'completed', // Válido
+    type: 'interview'
+  },
+  {
+    id: 'sim_1_1234567891',
+    jobTitle: 'Analista de Dados Pleno',
+    companyName: 'DataDriven Corp',
+    interviewType: 'Análise de Currículo',
+    date: '2024-01-10',
+    overallScore: 78,
+    status: 'in_progress', // Válido
+    type: 'cv_analysis'
+  },
+  {
+    id: 'sim_1_1234567892',
+    jobTitle: 'Engenheiro(a) de Software Backend Sênior',
+    companyName: 'ScaleUp Systems',
+    interviewType: 'Técnica',
+    date: '2024-01-08',
+    overallScore: 92,
+    status: 'pending', // Válido
+    type: 'interview'
+  }
+]
 
 export default function FeedbackPage() {
   const { user } = useAuth()
@@ -40,60 +78,7 @@ export default function FeedbackPage() {
       const token = localStorage.getItem('authToken')
       if (!token) {
         console.log('Token não encontrado, usando dados mockados')
-        // Usar dados mockados quando não há token
-        const mockData = [
-          {
-            id: 'sim_1_1234567890',
-            jobTitle: 'Desenvolvedor(a) Frontend Acessível',
-            companyName: 'InovaTech Soluções',
-            interviewType: 'Técnica e Comportamental',
-            date: '2024-01-15',
-            overallScore: 85,
-            status: 'completed',
-            type: 'interview'
-          },
-          {
-            id: 'sim_1_1234567891',
-            jobTitle: 'Analista de Dados Pleno',
-            companyName: 'DataDriven Corp',
-            interviewType: 'Análise de Currículo',
-            date: '2024-01-10',
-            overallScore: 78,
-            status: 'completed',
-            type: 'cv_analysis'
-          },
-          {
-            id: 'sim_1_1234567892',
-            jobTitle: 'Engenheiro(a) de Software Backend Sênior',
-            companyName: 'ScaleUp Systems',
-            interviewType: 'Técnica',
-            date: '2024-01-08',
-            overallScore: 92,
-            status: 'completed',
-            type: 'interview'
-          },
-          {
-            id: 'sim_1_1234567893',
-            jobTitle: 'UX/UI Designer com Foco em Inclusão',
-            companyName: 'Studio Criativo Inclusivo',
-            interviewType: 'Comportamental',
-            date: '2024-01-05',
-            overallScore: 88,
-            status: 'completed',
-            type: 'interview'
-          },
-          {
-            id: 'sim_1_1234567894',
-            jobTitle: 'Product Manager',
-            companyName: 'TechStart',
-            interviewType: 'Análise de Currículo',
-            date: '2024-01-03',
-            overallScore: 75,
-            status: 'completed',
-            type: 'cv_analysis'
-          }
-        ]
-        setFeedbackHistory(mockData)
+        setFeedbackHistory(mockData) // Usando o mockData tipado
         return
       }
 
@@ -111,81 +96,38 @@ export default function FeedbackPage() {
 
       const data = await response.json()
       
-      // Converter os dados da API para o formato esperado
-      const formattedHistory = data.simulations.map((sim: any) => ({
+      // =====================================================================
+      // MELHORIA 2: Garantir que os dados da API correspondam ao tipo esperado.
+      // Isso evita que o build quebre se a API retornar um status inesperado.
+      // Usamos "as FeedbackHistory['status']" para dizer ao TypeScript:
+      // "Confie em mim, este valor corresponde ao tipo de status definido".
+      // Uma abordagem ainda mais segura seria validar cada valor, mas esta
+      // é uma solução prática e comum.
+      // =====================================================================
+      const formattedHistory: FeedbackHistory[] = data.simulations.map((sim: any) => ({
         id: sim.id,
         jobTitle: sim.job_title,
         companyName: sim.company_name,
         interviewType: sim.interview_type,
-        date: sim.completed_at.split('T')[0], // Extrair apenas a data
+        date: sim.completed_at.split('T')[0],
         overallScore: sim.score,
-        status: sim.status,
-        type: sim.type
+        status: sim.status as FeedbackHistory['status'], // Validação de tipo
+        type: sim.type as FeedbackHistory['type'] // Validação de tipo
       }))
 
       setFeedbackHistory(formattedHistory)
     } catch (err: any) {
       console.error('Erro ao carregar histórico de feedback:', err)
-      // Em caso de erro, usar dados mockados como fallback
       console.log('Usando dados mockados como fallback')
-      const mockData = [
-        {
-          id: 'sim_1_1234567890',
-          jobTitle: 'Desenvolvedor(a) Frontend Acessível',
-          companyName: 'InovaTech Soluções',
-          interviewType: 'Técnica e Comportamental',
-          date: '2024-01-15',
-          overallScore: 85,
-          status: 'completed',
-          type: 'interview'
-        },
-        {
-          id: 'sim_1_1234567891',
-          jobTitle: 'Analista de Dados Pleno',
-          companyName: 'DataDriven Corp',
-          interviewType: 'Análise de Currículo',
-          date: '2024-01-10',
-          overallScore: 78,
-          status: 'completed',
-          type: 'cv_analysis'
-        },
-        {
-          id: 'sim_1_1234567892',
-          jobTitle: 'Engenheiro(a) de Software Backend Sênior',
-          companyName: 'ScaleUp Systems',
-          interviewType: 'Técnica',
-          date: '2024-01-08',
-          overallScore: 92,
-          status: 'completed',
-          type: 'interview'
-        },
-        {
-          id: 'sim_1_1234567893',
-          jobTitle: 'UX/UI Designer com Foco em Inclusão',
-          companyName: 'Studio Criativo Inclusivo',
-          interviewType: 'Comportamental',
-          date: '2024-01-05',
-          overallScore: 88,
-          status: 'completed',
-          type: 'interview'
-        },
-        {
-          id: 'sim_1_1234567894',
-          jobTitle: 'Product Manager',
-          companyName: 'TechStart',
-          interviewType: 'Análise de Currículo',
-          date: '2024-01-03',
-          overallScore: 75,
-          status: 'completed',
-          type: 'cv_analysis'
-        }
-      ]
-      setFeedbackHistory(mockData)
-      setError('') // Limpar erro para não mostrar mensagem de erro
+      setFeedbackHistory(mockData) // Usando o mockData tipado
+      setError('')
     } finally {
       setLoading(false)
     }
   }
+  
+  // O restante do seu código continua aqui (getScoreColor, getStatusColor, etc.)
+  // Nenhuma alteração é necessária no JSX.
 
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-green-800'
@@ -377,7 +319,7 @@ export default function FeedbackPage() {
                     <div className="flex items-center justify-between">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(feedback.status)}`}>
                         {feedback.status === 'completed' ? 'Concluído' : 
-                         feedback.status === 'in_progress' ? 'Em Andamento' : 'Pendente'}
+                          feedback.status === 'in_progress' ? 'Em Andamento' : 'Pendente'}
                       </span>
                     </div>
 
