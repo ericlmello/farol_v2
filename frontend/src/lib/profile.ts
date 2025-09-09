@@ -1,85 +1,48 @@
 import { api } from './api'
+// Importamos o tipo 'User' para ser usado na interface do Perfil
+import { User } from './auth'
 
 export interface Profile {
   id: number
   user_id: number
-  first_name: string
-  last_name: string
-  phone?: string
-  bio?: string
-  location?: string
-  linkedin_url?: string
-  github_url?: string
-  portfolio_url?: string
+  first_name: string | null
+  last_name: string | null
   has_disability: boolean
-  disability_type?: string
-  disability_description?: string
-  accessibility_needs?: string
-  experience_summary?: string
+  disability_details?: string | null
+  experience_summary: string
+  location: string
   created_at: string
-  updated_at?: string
-}
-
-export interface ProfileUpdateRequest {
-  first_name?: string
-  last_name?: string
-  phone?: string
-  bio?: string
-  location?: string
-  linkedin_url?: string
-  github_url?: string
-  portfolio_url?: string
-  has_disability?: boolean
-  disability_type?: string
-  disability_description?: string
-  accessibility_needs?: string
-  experience_summary?: string
-}
-
-// Alias para compatibilidade
-export type ProfileUpdate = ProfileUpdateRequest
-
-export interface CVAnalysis {
-  strengths: string[]
-  improvements: string[]
-  suggested_skills: string[]
-  accessibility_notes: string[]
+  // =====================================================================
+  // CORREÇÃO APLICADA AQUI:
+  // Adicionamos a propriedade 'user' que é retornada pela API junto com o perfil.
+  // =====================================================================
+  user: User
 }
 
 export const profileService = {
-  async getProfile(): Promise<Profile> {
-    const response = await api.get('/profile/me')
-    return response.data
-  },
-
-  async updateProfile(data: ProfileUpdateRequest): Promise<Profile> {
-    const response = await api.put('/profile/me', data)
-    return response.data
-  },
-
-  async uploadCV(file: File): Promise<{ message: string; analysis?: CVAnalysis; extracted_text?: string }> {
-    const formData = new FormData()
-    formData.append('file', file)
-    
-    const response = await api.post('/profile/upload-cv', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-    return response.data
-  },
-
-  async getCVAnalysis(): Promise<CVAnalysis> {
-    const response = await api.get('/profile/analysis')
-    return response.data
-  },
-
-  // Métodos com nomes diferentes para compatibilidade
+  /**
+   * Busca o perfil do usuário logado.
+   */
   async getMyProfile(): Promise<Profile> {
-    return this.getProfile()
+    const response = await api.get('/api/v1/profile/me')
+    return response.data
   },
 
-  async updateMyProfile(data: ProfileUpdateRequest): Promise<Profile> {
-    return this.updateProfile(data)
-  }
+  /**
+   * Função genérica para buscar perfil (pode ser a mesma que getMyProfile neste caso).
+   */
+  async getProfile(): Promise<Profile> {
+    // Para simplificar, estamos chamando o mesmo endpoint.
+    // Isso poderia ser ajustado para buscar perfis de outros usuários se necessário.
+    const response = await api.get('/api/v1/profile/me')
+    return response.data
+  },
+
+  /**
+   * Atualiza o perfil do usuário logado.
+   */
+  async updateProfile(profileData: Partial<Profile>): Promise<Profile> {
+    const response = await api.put('/api/v1/profile/me', profileData)
+    return response.data
+  },
 }
