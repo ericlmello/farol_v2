@@ -245,8 +245,8 @@ export class CompatibilityCalculator {
   private getDefaultScore(job: Job): CompatibilityScore {
     // Perfil padrão para programador backend Python
     const defaultProfile: Profile = {
-      id: '0',
-      user_id: '0',
+      id: 0,
+      user_id: 0,
       first_name: 'Programador',
       last_name: 'Python',
       has_disability: false,
