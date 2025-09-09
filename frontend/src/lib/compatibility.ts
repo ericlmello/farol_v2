@@ -2,7 +2,7 @@ import { Job } from './jobs'
 import { Profile } from './profile'
 
 export interface CompatibilityScore {
-  jobId: number
+  jobId: number | string
   score: number // 0-100
   factors: {
     skills: number
@@ -245,8 +245,8 @@ export class CompatibilityCalculator {
   private getDefaultScore(job: Job): CompatibilityScore {
     // Perfil padrão para programador backend Python
     const defaultProfile: Profile = {
-      id: 0,
-      user_id: 0,
+      id: '0',
+      user_id: '0',
       first_name: 'Programador',
       last_name: 'Python',
       has_disability: false,
@@ -287,7 +287,7 @@ export class CompatibilityCalculator {
     )
 
     return {
-       jobId: job.id,
+      jobId: job.id,
       score: Math.min(100, Math.max(0, score)),
       factors,
       details: this.getCompatibilityDetailsWithProfile(profile, job)
@@ -380,8 +380,13 @@ export class CompatibilityCalculator {
       jobLevel = 'senior'
     }
 
-    // Determinar nível do candidato (4 anos = pleno)
+    // Determinar nível do candidato
     let candidateLevel: 'junior' | 'pleno' | 'senior' = 'pleno'
+    if (EXPERIENCE_LEVELS.junior.some(keyword => profileText.includes(keyword))) {
+      candidateLevel = 'junior'
+    } else if (EXPERIENCE_LEVELS.senior.some(keyword => profileText.includes(keyword))) {
+      candidateLevel = 'senior'
+    }
 
     // Calcular compatibilidade de nível
     if (jobLevel === candidateLevel) return 100
