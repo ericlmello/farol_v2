@@ -1,91 +1,76 @@
 'use client'
 
+import React from 'react'
+import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui'
-import Link from 'next/link'
 
 export function Navigation() {
-  const { user, isLoading, logout, isAuthenticated } = useAuth()
+  // =====================================================================
+  // CORREÇÃO APLICADA AQUI: 'isLoading' foi renomeado para 'loading'
+  // para corresponder ao que é fornecido pelo AuthContext.
+  // =====================================================================
+  const { user, loading, logout, isAuthenticated } = useAuth()
 
-  if (isLoading) {
+  // Durante o carregamento inicial para verificar a autenticação,
+  // podemos mostrar um estado de "esqueleto" ou nulo.
+  if (loading) {
     return (
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="text-xl font-bold text-blue-600">
-                Farol
-              </Link>
+      <header className="bg-white shadow-sm">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex-shrink-0">
+              <span className="h-8 w-20 bg-gray-200 rounded animate-pulse"></span>
             </div>
-            <div className="flex items-center">
-              <div className="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+            <div className="hidden md:block">
+              <div className="ml-4 flex items-center md:ml-6 space-x-4">
+                <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </header>
     )
   }
 
   return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-blue-600">
-              Farol
+    <header className="bg-white shadow-sm">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex-shrink-0">
+            <Link href="/" className="text-xl font-bold text-gray-800">
+              Farol IA
             </Link>
           </div>
-          
-          <div className="flex items-center space-x-4">
-            {isAuthenticated ? (
-              <>
-                <div className="hidden md:flex items-center space-x-4">
-                  {user?.user_type === 'candidate' && (
-                    <>
-                      <Link href="/dashboard">
-                        <Button variant="ghost" size="sm">
-                          Dashboard
-                        </Button>
-                      </Link>
-                      <Link href="/jobs">
-                        <Button variant="ghost" size="sm">
-                          Vagas
-                        </Button>
-                      </Link>
-                    </>
-                  )}
-                </div>
-                <span className="text-sm text-gray-700">
-                  Olá, {user?.email}
-                </span>
-                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                  {user?.user_type}
-                </span>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={logout}
-                >
-                  Sair
-                </Button>
-              </>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="outline" size="sm">
-                    Entrar
+          <div className="hidden md:block">
+            <div className="ml-4 flex items-center md:ml-6 space-x-4">
+              {isAuthenticated ? (
+                <>
+                  <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                    Dashboard
+                  </Link>
+                  <Link href="/profile" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                    Meu Perfil
+                  </Link>
+                  <Button onClick={logout} variant="outline" size="sm">
+                    Sair
                   </Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="sm">
-                    Criar Conta
-                  </Button>
-                </Link>
-              </>
-            )}
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                    Login
+                  </Link>
+                  <Link href="/register">
+                    <Button size="sm">Criar Conta</Button>
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   )
 }
