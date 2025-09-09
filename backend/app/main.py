@@ -22,11 +22,16 @@ app = FastAPI(
 
 # 3º: Definição da lista origins
 origins = [
-    "http://localhost:3000",  # Frontend local
-    "http://127.0.0.1:3000",  # Frontend local alternativo
-    "http://frontend:3000",   # Frontend no Docker
-    "http://localhost",       # Desenvolvimento
-    "http://127.0.0.1",      # Desenvolvimento alternativo
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://frontend:3000",
+    "http://localhost",
+    "http://127.0.0.1",
+    # =======================================================
+    # CORREÇÃO APLICADA AQUI
+    # Adicionada a URL do seu frontend em produção
+    # =======================================================
+    "https://farol-v2-frontend.onrender.com"
 ]
 
 # 4º: Aplicação do CORSMiddleware PRIMEIRO
