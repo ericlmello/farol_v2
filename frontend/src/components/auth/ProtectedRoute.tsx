@@ -79,3 +79,16 @@ export function PublicRoute({ children }: { children: ReactNode }) {
   return null
 }
 
+// =====================================================================
+// NOVO HOOK ADICIONADO ABAIXO
+// Este hook verifica se o usuário atual tem permissão para acessar um recurso.
+// =====================================================================
+export function useCanAccess(allowedUserTypes: Array<'candidate' | 'recruiter'>): boolean {
+  const { isAuthenticated, user } = useAuth()
+
+  if (!isAuthenticated || !user) {
+    return false
+  }
+
+  return allowedUserTypes.includes(user.user_type)
+}
