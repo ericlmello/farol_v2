@@ -7,25 +7,31 @@ export interface Profile {
   user_id: number
   first_name: string | null
   last_name: string | null
+  // =====================================================================
+  // CORREÇÃO: Adicionados novos campos que estavam faltando
+  // =====================================================================
+  bio: string | null
+  location: string
   has_disability: boolean
   disability_details?: string | null
+  accessibility_needs?: string | null // Adicionado este campo
   experience_summary: string
-  location: string
   created_at: string
   user: User
 }
 
 // =====================================================================
-// NOVO TIPO ADICIONADO ABAIXO:
-// Define a estrutura para os dados de atualização do perfil.
+// CORREÇÃO: Adicionados os mesmos campos ao tipo de atualização
 // =====================================================================
 export interface ProfileUpdate {
   first_name?: string | null
   last_name?: string | null
+  bio?: string | null
+  location?: string
   has_disability?: boolean
   disability_details?: string | null
+  accessibility_needs?: string | null
   experience_summary?: string
-  location?: string
 }
 
 export interface CVAnalysis {
@@ -78,3 +84,4 @@ export const profileService = {
     }
   },
 }
+
