@@ -19,6 +19,20 @@ export interface Profile {
   user: User
 }
 
+// =====================================================================
+// NOVO TIPO ADICIONADO ABAIXO:
+// Define a estrutura para os dados de análise de currículo.
+// =====================================================================
+export interface CVAnalysis {
+  strengths: string[]
+  areas_for_improvement: string[]
+  keyword_analysis: {
+    matched: string[]
+    missing: string[]
+  }
+  overall_feedback: string
+}
+
 export const profileService = {
   /**
    * Busca o perfil do usuário logado.
@@ -43,6 +57,15 @@ export const profileService = {
    */
   async updateProfile(profileData: Partial<Profile>): Promise<Profile> {
     const response = await api.put('/api/v1/profile/me', profileData)
+    return response.data
+  },
+
+  // =====================================================================
+  // NOVA FUNÇÃO ADICIONADA ABAIXO:
+  // Busca a análise de currículo gerada pela IA para o usuário logado.
+  // =====================================================================
+  async getCVAnalysis(): Promise<CVAnalysis> {
+    const response = await api.get('/api/v1/profile/cv-analysis')
     return response.data
   },
 }
