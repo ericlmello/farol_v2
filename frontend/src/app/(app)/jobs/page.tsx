@@ -5,8 +5,14 @@ import { useAuth } from '@/contexts/AuthContext'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { jobsService, type Job, type JobFilters } from '@/lib/jobs'
 import { profileService, type Profile } from '@/lib/profile'
-import { compatibilityService, type JobWithCompatibility } from '@/lib/compatibilityService'
-import { getCompatibilityColor, getCompatibilityText } from '@/lib/compatibility'
+// =====================================================================
+// CORREÇÃO APLICADA AQUI
+// =====================================================================
+// A lógica (o serviço) vem do arquivo de serviço
+import { compatibilityService } from '@/lib/compatibilityService'
+// OS TIPOS (JobWithCompatibility) e as funções puras vêm do arquivo de tipos
+import { getCompatibilityColor, getCompatibilityText, type JobWithCompatibility } from '@/lib/compatibility'
+// =====================================================================
 import { Button, Input, Select, Label, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui'
 import Link from 'next/link'
 
