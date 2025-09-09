@@ -2,9 +2,19 @@
 
 import { api } from './api'
 
+// =====================================================================
+// CORREÇÃO 1: Criamos e exportamos a interface 'User'
+// =====================================================================
+export interface User {
+  id: number
+  email: string
+  user_type: 'candidate' | 'recruiter'
+  is_active: boolean
+}
+
 // Tipos para os dados de login e registro
 export interface LoginData {
-  username: string // O backend espera 'username' para o e-mail no login
+  username: string
   password: string
 }
 
@@ -17,21 +27,11 @@ export interface RegisterData {
 export interface AuthResponse {
   access_token: string
   token_type: string
-  user: {
-    id: number
-    email: string
-    user_type: 'candidate' | 'recruiter'
-    is_active: boolean
-  }
+  user: User // Agora usamos a interface 'User' que acabamos de criar
 }
 
 export const authService = {
-  /**
-   * Realiza o login do usuário.
-   * O backend espera um formulário, então formatamos os dados.
-   */
   async login(credentials: LoginData): Promise<AuthResponse> {
-    // O endpoint de token do FastAPI OAuth2 espera dados de formulário
     const formData = new URLSearchParams()
     formData.append('username', credentials.username)
     formData.append('password', credentials.password)
@@ -44,38 +44,23 @@ export const authService = {
     return response.data
   },
 
-  /**
-   * Realiza o cadastro de um novo usuário.
-   */
   async register(userData: RegisterData): Promise<AuthResponse> {
-    // =====================================================================
-    // CORREÇÃO APLICADA AQUI: Adicionado o prefixo /api/v1
-    // =====================================================================
     const response = await api.post('/api/v1/auth/register', userData)
     return response.data
   },
 
-  /**
-   * Salva o token de autenticação no localStorage.
-   */
   saveToken(token: string) {
     if (typeof window !== 'undefined') {
       localStorage.setItem('authToken', token)
     }
   },
 
-  /**
-   * Remove o token de autenticação do localStorage.
-   */
   logout() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('authToken')
     }
   },
 
-  /**
-   * Obtém o token de autenticação do localStorage.
-   */
   getToken(): string | null {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('authToken')
