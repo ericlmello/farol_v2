@@ -13,32 +13,28 @@ export function ProtectedRoute({
   children,
   allowedUserTypes,
 }: ProtectedRouteProps) {
-  // =====================================================================
-  // CORREÇÃO APLICADA AQUI: 'isLoading' foi renomeado para 'loading'
-  // para corresponder ao que é fornecido pelo AuthContext.
-  // =====================================================================
   const { isAuthenticated, loading, user } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    // Não faça nada enquanto a autenticação está sendo verificada
+    // Don't do anything while auth state is loading
     if (loading) {
       return
     }
 
-    // Se não está autenticado, redireciona para o login
+    // If not authenticated, redirect to login
     if (!isAuthenticated) {
       router.push('/login')
       return
     }
 
-    // Se o tipo de usuário não é permitido, redireciona para o dashboard
+    // If user type is not allowed, redirect to dashboard
     if (user && !allowedUserTypes.includes(user.user_type)) {
-      router.push('/dashboard') // ou para uma página de "acesso negado"
+      router.push('/dashboard') // or to an "access denied" page
     }
   }, [isAuthenticated, loading, user, allowedUserTypes, router])
 
-  // Exibe um estado de carregamento enquanto a verificação está em andamento
+  // Show a loading state while checking auth
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -47,11 +43,39 @@ export function ProtectedRoute({
     )
   }
 
-  // Se o usuário está autenticado e tem o tipo correto, renderiza o conteúdo
+  // If authenticated and user type is correct, render the content
   if (isAuthenticated && user && allowedUserTypes.includes(user.user_type)) {
     return <>{children}</>
   }
 
-  // Caso contrário, não renderiza nada (pois o useEffect fará o redirecionamento)
+  // Otherwise, render null while the redirect happens
   return null
 }
+
+// =====================================================================
+// NOVO COMPONENTE ADICIONADO ABAIXO
+// Este componente protege rotas que são apenas para usuários deslogados (ex: login, register)
+// =====================================================================
+export function PublicRoute({ children }: { children: ReactNode }) {
+  const { isAuthenticated, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    // Se a autenticação já foi verificada e o usuário ESTÁ logado,
+    // redireciona para o dashboard.
+    if (!loading && isAuthenticated) {
+      router.push('/dashboard')
+    }
+  }, [isAuthenticated, loading, router])
+
+  // Enquanto carrega ou se o usuário não está autenticado,
+  // exibe a página (ex: a página de login).
+  if (loading || !isAuthenticated) {
+    return <>{children}</>
+  }
+
+  // Se o usuário está autenticado, não renderiza nada
+  // pois o redirecionamento já foi iniciado.
+  return null
+}
+
