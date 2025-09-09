@@ -25,7 +25,11 @@ export interface Profile {
 // =====================================================================
 export interface CVAnalysis {
   strengths: string[]
-  areas_for_improvement: string[]
+  // CORREÇÃO: Renomeado para 'improvements' e adicionado os outros campos
+  // que a página de análise espera.
+  improvements: string[]
+  suggested_skills: string[]
+  accessibility_notes: string[]
   keyword_analysis: {
     matched: string[]
     missing: string[]
@@ -66,6 +70,11 @@ export const profileService = {
   // =====================================================================
   async getCVAnalysis(): Promise<CVAnalysis> {
     const response = await api.get('/api/v1/profile/cv-analysis')
-    return response.data
+    // A API original pode retornar 'areas_for_improvement', então mapeamos para 'improvements'
+    const data = response.data
+    return {
+      ...data,
+      improvements: data.areas_for_improvement || [],
+    }
   },
 }
