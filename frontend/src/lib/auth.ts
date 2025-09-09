@@ -1,38 +1,42 @@
+// ARQUIVO: frontend/src/lib/auth.ts
+
 import { api } from './api'
 
-export interface LoginRequest {
-  username: string // O backend espera 'username' para o OAuth2PasswordRequestForm
+// Tipos para os dados de login e registro
+export interface LoginData {
+  username: string // O backend espera 'username' para o e-mail no login
   password: string
 }
 
-export interface RegisterRequest {
+export interface RegisterData {
   email: string
   password: string
-  user_type: 'candidate' | 'company' | 'admin'
+  user_type: 'candidate' | 'recruiter'
 }
 
 export interface AuthResponse {
   access_token: string
   token_type: string
-}
-
-export interface User {
-  id: number
-  email: string
-  user_type: 'candidate' | 'company' | 'admin'
-  is_active: boolean
-  is_verified: boolean
-  created_at: string
-  updated_at?: string
+  user: {
+    id: number
+    email: string
+    user_type: 'candidate' | 'recruiter'
+    is_active: boolean
+  }
 }
 
 export const authService = {
-  async login(credentials: LoginRequest): Promise<AuthResponse> {
-    const formData = new FormData()
+  /**
+   * Realiza o login do usuário.
+   * O backend espera um formulário, então formatamos os dados.
+   */
+  async login(credentials: LoginData): Promise<AuthResponse> {
+    // O endpoint de token do FastAPI OAuth2 espera dados de formulário
+    const formData = new URLSearchParams()
     formData.append('username', credentials.username)
     formData.append('password', credentials.password)
 
-    const response = await api.post('/auth/login', formData, {
+    const response = await api.post('/api/v1/auth/token', formData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
@@ -40,30 +44,42 @@ export const authService = {
     return response.data
   },
 
-  async register(userData: RegisterRequest): Promise<User> {
-    const response = await api.post('/auth/register', userData)
+  /**
+   * Realiza o cadastro de um novo usuário.
+   */
+  async register(userData: RegisterData): Promise<AuthResponse> {
+    // =====================================================================
+    // CORREÇÃO APLICADA AQUI: Adicionado o prefixo /api/v1
+    // =====================================================================
+    const response = await api.post('/api/v1/auth/register', userData)
     return response.data
   },
 
-  async getCurrentUser(): Promise<User> {
-    const response = await api.get('/auth/me')
-    return response.data
+  /**
+   * Salva o token de autenticação no localStorage.
+   */
+  saveToken(token: string) {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('authToken', token)
+    }
   },
 
+  /**
+   * Remove o token de autenticação do localStorage.
+   */
   logout() {
-    localStorage.removeItem('authToken')
-    window.location.href = '/login'
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('authToken')
+    }
   },
 
+  /**
+   * Obtém o token de autenticação do localStorage.
+   */
   getToken(): string | null {
-    return localStorage.getItem('authToken')
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('authToken')
+    }
+    return null
   },
-
-  setToken(token: string) {
-    localStorage.setItem('authToken', token)
-  },
-
-  isAuthenticated(): boolean {
-    return !!this.getToken()
-  }
 }
