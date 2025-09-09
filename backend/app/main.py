@@ -48,7 +48,7 @@ app.add_middleware(
 api_router = APIRouter(prefix="/api/v1")
 
 # 6º: TODAS as chamadas api_router.include_router para TODOS os módulos
-api_router.include_router(auth_router)
+api_router.include_router(auth_router, prefix="/auth", tags=["Authentication"]) # <-- CORREÇÃO AQUI
 api_router.include_router(profile_router, prefix="/profile")
 api_router.include_router(jobs_router)
 api_router.include_router(company_router)
