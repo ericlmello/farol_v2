@@ -287,7 +287,7 @@ export class CompatibilityCalculator {
     )
 
     return {
-      jobId,
+       jobId: job.id,
       score: Math.min(100, Math.max(0, score)),
       factors,
       details: this.getCompatibilityDetailsWithProfile(profile, job)
