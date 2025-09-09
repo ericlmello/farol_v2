@@ -7,14 +7,15 @@ export interface Profile {
   user_id: number
   first_name: string | null
   last_name: string | null
-  // =====================================================================
-  // CORREÇÃO: Adicionados novos campos que estavam faltando
-  // =====================================================================
   bio: string | null
   location: string
   has_disability: boolean
-  disability_details?: string | null
-  accessibility_needs?: string | null // Adicionado este campo
+  // =====================================================================
+  // CORREÇÃO: Adicionados os novos campos de detalhe de deficiência
+  // =====================================================================
+  disability_type?: string | null
+  disability_description?: string | null
+  accessibility_needs?: string | null
   experience_summary: string
   created_at: string
   user: User
@@ -29,7 +30,8 @@ export interface ProfileUpdate {
   bio?: string | null
   location?: string
   has_disability?: boolean
-  disability_details?: string | null
+  disability_type?: string | null
+  disability_description?: string | null
   accessibility_needs?: string | null
   experience_summary?: string
 }
@@ -84,4 +86,3 @@ export const profileService = {
     }
   },
 }
-
