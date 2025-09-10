@@ -1,10 +1,8 @@
-// ARQUIVO: frontend/src/contexts/AuthContext.tsx
-
 'use client'
 
 import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
-import { authService, User } from '@/lib/auth' // A importação agora funciona
+import { useRouter } from 'next/navigation'
+import { authService, User } from '@/lib/auth'
 import { profileService } from '@/lib/profile'
 import { jwtDecode } from 'jwt-decode'
 
@@ -22,21 +20,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const pathname = usePathname()
 
   const initializeAuth = useCallback(async () => {
     const token = authService.getToken()
     if (token) {
       try {
-        const decoded: { sub: string, exp: number, user_type: 'candidate' | 'recruiter' } = jwtDecode(token)
-        // Verificar se o token expirou
+        const decoded: { sub: string; exp: number } = jwtDecode(token)
         if (decoded.exp * 1000 < Date.now()) {
           authService.logout()
           setUser(null)
         } else {
-          // Tentar buscar o perfil para confirmar que o usuário é válido
+          // Buscar o perfil para obter os dados completos do usuário
           const userProfile = await profileService.getMyProfile()
-          setUser(userProfile.user) // Assumindo que o perfil retornado tem o objeto do usuário
+          setUser(userProfile.user)
         }
       } catch (error) {
         console.error('Falha ao inicializar autenticação:', error)
@@ -71,10 +67,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   )
 }
 
+// Hook principal para acessar todo o contexto
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (context === undefined) {
     throw new Error('useAuth deve ser usado dentro de um AuthProvider')
   }
   return context
+}
+
+// =====================================================================
+// NOVOS HOOKS ADICIONADOS ABAIXO
+// =====================================================================
+
+/**
+ * Hook de atalho para obter o tipo do usuário logado.
+ */
+export const useUserType = () => {
+  const { user } = useAuth()
+  return user?.user_type
+}
+
+/**
+ * Hook de atalho para verificar se o usuário está ativo.
+ */
+export const useIsActive = () => {
+  const { user } = useAuth()
+  return user?.is_active
 }
