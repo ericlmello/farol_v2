@@ -10,9 +10,6 @@ export interface Profile {
   bio: string | null
   location: string
   has_disability: boolean
-  // =====================================================================
-  // CORREÇÃO: Adicionados os novos campos de detalhe de deficiência
-  // =====================================================================
   disability_type?: string | null
   disability_description?: string | null
   accessibility_needs?: string | null
@@ -21,9 +18,6 @@ export interface Profile {
   user: User
 }
 
-// =====================================================================
-// CORREÇÃO: Adicionados os mesmos campos ao tipo de atualização
-// =====================================================================
 export interface ProfileUpdate {
   first_name?: string | null
   last_name?: string | null
@@ -46,6 +40,14 @@ export interface CVAnalysis {
     missing: string[]
   }
   overall_feedback: string
+}
+
+// =====================================================================
+// NOVO TIPO ADICIONADO: Define a resposta esperada do upload do CV
+// =====================================================================
+export interface UploadCVResponse {
+  message: string
+  analysis: CVAnalysis
 }
 
 export const profileService = {
@@ -85,5 +87,20 @@ export const profileService = {
       improvements: data.areas_for_improvement || [],
     }
   },
-}
 
+  // =====================================================================
+  // NOVA FUNÇÃO ADICIONADA ABAIXO:
+  // Envia o arquivo do currículo para a API e retorna a análise.
+  // =====================================================================
+  async uploadCV(file: File): Promise<UploadCVResponse> {
+    const formData = new FormData()
+    formData.append('cv_file', file)
+
+    const response = await api.post('/api/v1/profile/upload-cv', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return response.data
+  },
+}
