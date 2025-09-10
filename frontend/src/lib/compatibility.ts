@@ -1,5 +1,6 @@
 import { Job } from './jobs'
 import { Profile } from './profile'
+import { User } from './auth' // Importar o tipo User
 
 export interface CompatibilityScore {
   jobId: number | string
@@ -122,7 +123,7 @@ export class CompatibilityCalculator {
     const jobLocation = job.location.toLowerCase()
 
     // Verificar se é a mesma cidade/estado
-    if (profileLocation.includes(jobLocation.split(',')[0]) || 
+    if (profileLocation.includes(jobLocation.split(',')[0]) ||
         jobLocation.includes(profileLocation.split(',')[0])) {
       return 100
     }
@@ -130,7 +131,7 @@ export class CompatibilityCalculator {
     // Verificar se é o mesmo estado
     const profileState = profileLocation.split(',').pop()?.trim()
     const jobState = jobLocation.split(',').pop()?.trim()
-    
+
     if (profileState && jobState && profileState === jobState) {
       return 80
     }
@@ -155,7 +156,7 @@ export class CompatibilityCalculator {
     const jobText = `${job.description} ${job.requirements || ''} ${job.benefits || ''}`.toLowerCase()
     const accessibilityKeywords = ['acessível', 'acessibilidade', 'inclusivo', 'inclusão', 'pcd', 'deficiência', 'diversidade']
 
-    const hasAccessibilityMention = accessibilityKeywords.some(keyword => 
+    const hasAccessibilityMention = accessibilityKeywords.some(keyword =>
       jobText.includes(keyword)
     )
 
@@ -244,15 +245,26 @@ export class CompatibilityCalculator {
 
   private getDefaultScore(job: Job): CompatibilityScore {
     // Perfil padrão para programador backend Python
+    // =====================================================================
+    // CORREÇÃO APLICADA AQUI: Adicionadas as propriedades 'bio' e 'user'
+    // que estavam faltando para corresponder à interface 'Profile'.
+    // =====================================================================
     const defaultProfile: Profile = {
       id: 0,
       user_id: 0,
       first_name: 'Programador',
       last_name: 'Python',
+      bio: 'Usuário padrão para cálculo de compatibilidade.',
       has_disability: false,
       experience_summary: 'Desenvolvedor backend Python com 4 anos de experiência em Django, FastAPI, PostgreSQL, Redis, Docker, AWS. Conhecimento em testes automatizados, APIs REST, microserviços e CI/CD. Experiência com metodologias ágeis e trabalho remoto.',
       location: 'São Paulo, SP',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      user: {
+        id: 0,
+        email: 'default@example.com',
+        user_type: 'candidate',
+        is_active: true
+      }
     }
 
     // Calcular compatibilidade com perfil padrão
@@ -260,7 +272,7 @@ export class CompatibilityCalculator {
   }
 
   private calculateCompatibilityWithProfile(profile: Profile, job: Job): CompatibilityScore {
-    
+
     const factors = {
       skills: this.calculateSkillsMatchWithProfile(profile, job),
       location: this.calculateLocationMatchWithProfile(profile, job),
@@ -326,7 +338,7 @@ export class CompatibilityCalculator {
     const jobLocation = job.location.toLowerCase()
 
     // Verificar se é a mesma cidade/estado
-    if (profileLocation.includes(jobLocation.split(',')[0]) || 
+    if (profileLocation.includes(jobLocation.split(',')[0]) ||
         jobLocation.includes(profileLocation.split(',')[0])) {
       return 100
     }
@@ -334,7 +346,7 @@ export class CompatibilityCalculator {
     // Verificar se é o mesmo estado
     const profileState = profileLocation.split(',').pop()?.trim()
     const jobState = jobLocation.split(',').pop()?.trim()
-    
+
     if (profileState && jobState && profileState === jobState) {
       return 80
     }
@@ -359,7 +371,7 @@ export class CompatibilityCalculator {
     const jobText = `${job.description} ${job.requirements || ''} ${job.benefits || ''}`.toLowerCase()
     const accessibilityKeywords = ['acessível', 'acessibilidade', 'inclusivo', 'inclusão', 'pcd', 'deficiência', 'diversidade']
 
-    const hasAccessibilityMention = accessibilityKeywords.some(keyword => 
+    const hasAccessibilityMention = accessibilityKeywords.some(keyword =>
       jobText.includes(keyword)
     )
 
