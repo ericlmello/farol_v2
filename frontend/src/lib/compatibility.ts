@@ -246,8 +246,8 @@ export class CompatibilityCalculator {
   private getDefaultScore(job: Job): CompatibilityScore {
     // Perfil padrão para programador backend Python
     // =====================================================================
-    // CORREÇÃO APLICADA AQUI: Adicionadas as propriedades 'bio' e 'user'
-    // que estavam faltando para corresponder à interface 'Profile'.
+    // CORREÇÃO: Adicionadas as propriedades 'bio' e 'user' que estavam
+    // faltando para corresponder à interface 'Profile'.
     // =====================================================================
     const defaultProfile: Profile = {
       id: 0,
@@ -264,7 +264,12 @@ export class CompatibilityCalculator {
         email: 'default@example.com',
         user_type: 'candidate',
         is_active: true
-      }
+      },
+      // Adicionando os campos restantes para satisfazer a interface Profile
+      disability_details: null,
+      accessibility_needs: null,
+      disability_type: null,
+      disability_description: null,
     }
 
     // Calcular compatibilidade com perfil padrão
