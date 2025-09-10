@@ -59,6 +59,14 @@ export const authService = {
     }
   },
 
+  // =====================================================================
+  // CORREÇÃO: Adicionado um "alias" para consistência com o AuthContext.
+  // Agora, tanto setToken quanto saveToken funcionarão.
+  // =====================================================================
+  saveToken(token: string) {
+    this.setToken(token)
+  },
+
   /**
    * Remove o token de autenticação do localStorage.
    */
@@ -78,9 +86,6 @@ export const authService = {
     return null
   },
 
-  // =====================================================================
-  // NOVO MÉTODO ADICIONADO ABAIXO
-  // =====================================================================
   /**
    * Verifica se existe um token válido e não expirado.
    */
@@ -128,4 +133,3 @@ export const authService = {
     return null
   }
 }
-
