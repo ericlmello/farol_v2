@@ -53,7 +53,7 @@ export const authService = {
   /**
    * Salva o token de autenticação no localStorage.
    */
-  saveToken(token: string) {
+  setToken(token: string) {
     if (typeof window !== 'undefined') {
       localStorage.setItem('authToken', token)
     }
