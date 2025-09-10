@@ -43,11 +43,13 @@ export interface CVAnalysis {
 }
 
 // =====================================================================
-// NOVO TIPO ADICIONADO: Define a resposta esperada do upload do CV
+// CORREÇÃO APLICADA AQUI:
+// Adicionada a propriedade 'extracted_text' que a página de perfil espera.
 // =====================================================================
 export interface UploadCVResponse {
   message: string
   analysis: CVAnalysis
+  extracted_text: string
 }
 
 export const profileService = {
@@ -88,10 +90,9 @@ export const profileService = {
     }
   },
 
-  // =====================================================================
-  // NOVA FUNÇÃO ADICIONADA ABAIXO:
-  // Envia o arquivo do currículo para a API e retorna a análise.
-  // =====================================================================
+  /**
+   * Envia o arquivo do currículo para a API e retorna a análise.
+   */
   async uploadCV(file: File): Promise<UploadCVResponse> {
     const formData = new FormData()
     formData.append('cv_file', file)
@@ -104,3 +105,4 @@ export const profileService = {
     return response.data
   },
 }
+
