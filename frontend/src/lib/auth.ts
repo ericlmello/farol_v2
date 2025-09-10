@@ -1,6 +1,7 @@
 // ARQUIVO: frontend/src/lib/auth.ts
 
 import { api } from './api'
+import { jwtDecode } from 'jwt-decode'
 
 // Tipos para os dados de login e registro
 export interface LoginData {
@@ -48,9 +49,6 @@ export const authService = {
    * Realiza o cadastro de um novo usuário.
    */
   async register(userData: RegisterData): Promise<AuthResponse> {
-    // =====================================================================
-    // CORREÇÃO APLICADA AQUI: Adicionado o prefixo /api/v1
-    // =====================================================================
     const response = await api.post('/api/v1/auth/register', userData)
     return response.data
   },
@@ -81,6 +79,32 @@ export const authService = {
       return localStorage.getItem('authToken')
     }
     return null
+  },
+
+  /**
+   * Verifica se o usuário está autenticado (token existe e não está expirado).
+   */
+  isAuthenticated(): boolean {
+    const token = this.getToken()
+    if (!token) {
+      return false
+    }
+    try {
+      const decoded: { exp: number } = jwtDecode(token)
+      // Verifica se o tempo de expiração do token é maior que o tempo atual
+      return decoded.exp * 1000 > Date.now()
+    } catch (error) {
+      console.error('Token inválido:', error)
+      return false
+    }
+  },
+
+  /**
+   * Busca os dados do usuário logado a partir do token.
+   */
+  async getCurrentUser(): Promise<User> {
+    const response = await api.get('/api/v1/users/me')
+    return response.data
   },
 }
 
