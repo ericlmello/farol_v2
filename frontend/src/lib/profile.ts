@@ -68,7 +68,7 @@ export const profileService = {
   /**
    * Atualiza o perfil do usuário logado.
    */
-  async updateProfile(profileData: ProfileUpdate): Promise<Profile> {
+  async updateMyProfile(profileData: ProfileUpdate): Promise<Profile> {
     const response = await api.put('/api/v1/profile/me', profileData)
     return response.data
   },
@@ -86,3 +86,4 @@ export const profileService = {
     }
   },
 }
+
