@@ -44,6 +44,13 @@ export class CompatibilityService {
     return CompatibilityService.instance
   }
 
+  /**
+   * Calcula a compatibilidade de uma vaga específica.
+   */
+  public calculateJobCompatibility(job: Job): CompatibilityScore {
+    return this.calculator.calculateCompatibility(job)
+  }
+
   public calculateMultipleJobsCompatibility(jobs: Job[]): JobWithCompatibility[] {
     return this.calculator.calculateMultipleJobs(jobs)
   }
