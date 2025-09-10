@@ -63,6 +63,13 @@ export const authService = {
   },
 
   /**
+   * Alias para setToken para garantir compatibilidade em todo o código.
+   */
+  saveToken(token: string) {
+    this.setToken(token)
+  },
+
+  /**
    * Remove o token de autenticação do localStorage.
    */
   logout() {
