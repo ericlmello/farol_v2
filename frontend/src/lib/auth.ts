@@ -1,15 +1,10 @@
+// ARQUIVO: frontend/src/lib/auth.ts
+
 import { api } from './api'
-import { jwtDecode } from 'jwt-decode'
 
-export interface User {
-  id: number
-  email: string
-  user_type: 'candidate' | 'recruiter'
-  is_active: boolean
-}
-
+// Tipos para os dados de login e registro
 export interface LoginData {
-  username: string
+  username: string // O backend espera 'username' para o e-mail no login
   password: string
 }
 
@@ -17,6 +12,13 @@ export interface RegisterData {
   email: string
   password: string
   user_type: 'candidate' | 'recruiter'
+}
+
+export interface User {
+  id: number
+  email: string
+  user_type: 'candidate' | 'recruiter'
+  is_active: boolean
 }
 
 export interface AuthResponse {
@@ -46,6 +48,9 @@ export const authService = {
    * Realiza o cadastro de um novo usuário.
    */
   async register(userData: RegisterData): Promise<AuthResponse> {
+    // =====================================================================
+    // CORREÇÃO APLICADA AQUI: Adicionado o prefixo /api/v1
+    // =====================================================================
     const response = await api.post('/api/v1/auth/register', userData)
     return response.data
   },
@@ -53,18 +58,10 @@ export const authService = {
   /**
    * Salva o token de autenticação no localStorage.
    */
-  setToken(token: string) {
+  saveToken(token: string) {
     if (typeof window !== 'undefined') {
       localStorage.setItem('authToken', token)
     }
-  },
-
-  // =====================================================================
-  // CORREÇÃO: Adicionado um "alias" para consistência com o AuthContext.
-  // Agora, tanto setToken quanto saveToken funcionarão.
-  // =====================================================================
-  saveToken(token: string) {
-    this.setToken(token)
   },
 
   /**
@@ -85,51 +82,5 @@ export const authService = {
     }
     return null
   },
-
-  /**
-   * Verifica se existe um token válido e não expirado.
-   */
-  isAuthenticated(): boolean {
-    const token = this.getToken()
-    if (!token) {
-      return false
-    }
-
-    try {
-      const decoded: { exp: number } = jwtDecode(token)
-      // Verifica se o token expirou
-      if (decoded.exp * 1000 < Date.now()) {
-        this.logout() // Limpa o token expirado
-        return false
-      }
-      return true
-    } catch (error) {
-      console.error('Token inválido:', error)
-      return false
-    }
-  },
-
-  /**
-   * Busca os dados do usuário atual a partir do token.
-   * (Esta função pode ser expandida ou usar um endpoint /me da API)
-   */
-  async getCurrentUser(): Promise<User | null> {
-    if (!this.isAuthenticated()) {
-      return null
-    }
-    // A lógica para buscar o usuário pode ser mais complexa,
-    // como chamar um endpoint /api/v1/users/me
-    // Por enquanto, podemos decodificar o token para obter informações básicas
-    const token = this.getToken()
-    if (token) {
-        try {
-            // A sua API deve incluir os dados do usuário no token para isto funcionar
-            const decoded: { user: User } = jwtDecode(token) 
-            return decoded.user
-        } catch (e) {
-            return null
-        }
-    }
-    return null
-  }
 }
+
